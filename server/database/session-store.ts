@@ -9,8 +9,12 @@ export class SessionStore {
 
   getUserBySessionId(sessionId: string) {
     const session = this.sessions[sessionId];
-    const isSessionValid = session && session.isValid();
-    return isSessionValid ? session.user : undefined;
+    return this.isSessionValid(session) ? session.user : undefined;
+  }
+
+  isSessionValid(sessionId: any): boolean {
+    const session = this.sessions[sessionId];
+    return session && session.isValid();
   }
 }
 
