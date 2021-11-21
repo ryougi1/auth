@@ -2,8 +2,9 @@ import * as express from "express";
 import { Application } from "express";
 import * as fs from "fs";
 import * as https from "https";
-import { createUser } from "./create-user.route";
-import { readAllLessons } from "./read-all-lessons.route";
+import { createUser } from "./routes/create-user.route";
+import { getUser } from "./routes/get-user.route";
+import { readAllLessons } from "./routes/read-all-lessons.route";
 
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
@@ -25,6 +26,8 @@ const options = commandLineArgs(optionDefinitions);
 app.route("/api/lessons").get(readAllLessons);
 
 app.route("/api/signup").post(createUser);
+
+app.route("/api/user").get(getUser);
 
 if (options.secure) {
   const httpsServer = https.createServer(
