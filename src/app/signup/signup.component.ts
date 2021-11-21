@@ -20,9 +20,9 @@ export class SignupComponent implements OnInit {
 
   constructor(private fb: FormBuilder, private authService: AuthService) {
     this.form = this.fb.group({
-      email: ["", Validators.required],
-      password: ["", Validators.required],
-      confirm: ["", Validators.required],
+      email: ["test@gmail.com", Validators.required],
+      password: ["P4ssw0rd123", Validators.required],
+      confirm: ["P4ssw0rd123", Validators.required],
     });
   }
 
@@ -35,6 +35,8 @@ export class SignupComponent implements OnInit {
         () => console.log("User created successfully"),
         (response) => (this.errors = response.error.errors)
       );
+    } else {
+      //
     }
   }
 }
