@@ -3,7 +3,7 @@ import { db } from "../database/database";
 import { USERS } from "../database/database-data";
 import * as argon2 from "argon2";
 import { validatePassword } from "../password-validation";
-import { randomBytes } from "../security-utils";
+import { createSessionToken, randomBytes } from "../security-utils";
 import { sessionStore } from "../database/session-store";
 
 export function createUser(req: Request, res: Response) {
@@ -22,12 +22,14 @@ async function createUserAndSession(res: Response, credentials: any) {
   const user = db.createUser(credentials.email, passwordDigest);
   console.log(USERS);
 
-  const sessionId = await randomBytes(32).then((bytes) =>
-    bytes.toString("hex")
-  );
-  console.log("Session id:", sessionId);
-  sessionStore.createSession(sessionId, user);
+  // const sessionId = await randomBytes(32).then((bytes) =>
+  //   bytes.toString("hex")
+  // );
+  // console.log("Session id:", sessionId);
+  // sessionStore.createSession(sessionId, user);
 
-  res.cookie("SESSIONID", sessionId, { httpOnly: true, secure: true });
+  const sessionToken = await createSessionToken(user.id.toString());
+
+  res.cookie("SESSIONID", sessionToken, { httpOnly: true, secure: true });
   res.status(200).json({ id: user.id, email: user.email });
 }

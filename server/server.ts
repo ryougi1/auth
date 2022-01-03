@@ -2,8 +2,12 @@ import * as express from "express";
 import { Application } from "express";
 import * as fs from "fs";
 import * as https from "https";
+import { checkIfAuthenticated } from "./middleware/auth.middleware";
+import { retrieveUserIdFromRequest } from "./middleware/get-user.middleware";
 import { createUser } from "./routes/create-user.route";
 import { getUser } from "./routes/get-user.route";
+import { login } from "./routes/login.route";
+import { logout } from "./routes/logout.route";
 import { readAllLessons } from "./routes/read-all-lessons.route";
 
 const bodyParser = require("body-parser");
@@ -11,8 +15,9 @@ const cookieParser = require("cookie-parser");
 
 const app: Application = express();
 
-app.use(bodyParser.json());
 app.use(cookieParser());
+app.use(retrieveUserIdFromRequest);
+app.use(bodyParser.json());
 
 const commandLineArgs = require("command-line-args");
 
@@ -23,11 +28,15 @@ const optionDefinitions = [
 const options = commandLineArgs(optionDefinitions);
 
 // REST API
-app.route("/api/lessons").get(readAllLessons);
+app.route("/api/lessons").get(checkIfAuthenticated, readAllLessons);
 
 app.route("/api/signup").post(createUser);
 
 app.route("/api/user").get(getUser);
+
+app.route("/api/login").post(login);
+
+app.route("/api/logout").post(checkIfAuthenticated, logout);
 
 if (options.secure) {
   const httpsServer = https.createServer(
