@@ -3,6 +3,7 @@ import { Application } from "express";
 import * as fs from "fs";
 import * as https from "https";
 import { checkIfAuthenticated } from "./middleware/auth.middleware";
+import { checkCsrfToken } from "./middleware/csrf.middleware";
 import { retrieveUserIdFromRequest } from "./middleware/get-user.middleware";
 import { createUser } from "./routes/create-user.route";
 import { getUser } from "./routes/get-user.route";
@@ -36,7 +37,7 @@ app.route("/api/user").get(getUser);
 
 app.route("/api/login").post(login);
 
-app.route("/api/logout").post(checkIfAuthenticated, logout);
+app.route("/api/logout").post(checkIfAuthenticated, checkCsrfToken, logout);
 
 if (options.secure) {
   const httpsServer = https.createServer(

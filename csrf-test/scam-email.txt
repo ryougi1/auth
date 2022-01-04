@@ -1,0 +1,5 @@
+Your Windows license has expired. Click the link below to remedy. 
+   Click this link -> http://localhost:8080/csrf-test/csrf-page.html
+
+This would normally send you to a domain under the attacker control,
+but here we sent it to localhost as a demo.

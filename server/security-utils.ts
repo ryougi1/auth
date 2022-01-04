@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import * as jwt from "jsonwebtoken";
+import * as argon2 from "argon2";
 const nodeUtil = require("util");
 const nodeCrypto = require("crypto");
 
@@ -22,4 +23,8 @@ export async function decodeJwt(token: string) {
   const payload = await jwt.verify(token, RSA_PUBLIC_KEY);
   console.log("Decoded JWT payload:", payload);
   return payload;
+}
+
+export async function createCsrfToken(sessionToken: string) {
+  return argon2.hash(sessionToken);
 }

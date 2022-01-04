@@ -44,3 +44,23 @@ On the server there are two Express middle-wares:
 2.  The second middle-ware is selectively placed on certain end-points to ensure that a user is logged in, by looking for the user ID (attached by the first middle-ware). This makes it possible to block anonymous users from viewing specific content.
 
 Upon expiry of the JWT a new login will have to be made. A logout immediately expires the JWT.
+
+## CSRF
+
+CSRF vulnerability is handled using a XSRF token, or the double submit cookie defence.
+
+In short, a CSRF attack occurs when an attacker e.g. gets a victim to click a link which redirects to the attacker's domain. From that site, an HTML form fires off a request to your server, possibly performing an un-authorized action. The browser will allow the request to go through, and even straps on any authentication cookies to it as well. From the servers point of view, it looks as though it's the victim performing these actions.
+
+Some things to note:
+
+- Victim is already authenticated on your server
+- HTML forms are only able to fire off GET and POST requests. Afterwards, the attacker is not able to read the response, hence why a CSRF attack is considered a blind attack.
+  - Provided that no GET requests are mutating any data, simply reading, we are mainly concerned with POST requests.
+  - Since the attack is originating from a form, it is not possible to write any JSON to the POST request body. Arguments would have to be in the URL as query parameters.
+  - It is also not possible to modify any headers from the form.
+
+A XSRF token is commonly used to safeguard against CSRF attacks. What we want to achieve is for the server to know that the request is being made from the right client. The server can specify a random value and tell the client to send together with any request via a cookie.
+
+At first hand, it looks like this solution would be vulnerable to the exact same problem - the browser will strap on this cookie in an CSRF attack, and we just introduced more validation work for the server as it would have to remember what the tokens are to verify they're correct.
+
+Once the cookie is received in the client, it has to copy it over into a custom HTTP header, often denoted x-xsrf-token. Since forms can't manipulate headers, we can be sure it came from our client. Furthermore, if the value in the header matches the value in the cookie, then we consider it valid, so no sessions are needed on the server side for remembering which XSRF tokens are valid.
