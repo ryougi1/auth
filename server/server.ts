@@ -3,8 +3,11 @@ import { Application } from "express";
 import * as fs from "fs";
 import * as https from "https";
 import { readAllLessons } from "./routes/read-all-lessons.route";
+import { userInfo } from "./routes/user-info.route";
 
 const bodyParser = require("body-parser");
+const jwksRsa = require("jwks-rsa");
+const jwt = require("express-jwt");
 
 const app: Application = express();
 
@@ -18,8 +21,28 @@ const optionDefinitions = [
 
 const options = commandLineArgs(optionDefinitions);
 
+// JWT middleware
+const checkIfAuthenticated = jwt({
+  secret: jwksRsa.expressJwtSecret({
+    cache: true,
+    rateLimit: true,
+    jwksUri: "https://dev-wno-7lrh.us.auth0.com/.well-known/jwks.json",
+  }),
+  algorithms: ["RS256"],
+});
+app.use(checkIfAuthenticated);
+// JWT error handling
+app.use((err, req, res, next) => {
+  if (err && err.name == "UnauthorizedError") {
+    res.status(err.status).json({ message: err.message });
+  } else {
+    next();
+  }
+});
+
 // REST API
 app.route("/api/lessons").get(readAllLessons);
+app.route("/api/userinfo").put(userInfo);
 
 if (options.secure) {
   const httpsServer = https.createServer(

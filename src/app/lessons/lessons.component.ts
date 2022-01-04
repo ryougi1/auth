@@ -1,8 +1,9 @@
 import { Component, OnInit } from "@angular/core";
 import { LessonsService } from "../services/lessons.service";
-import { Observable } from "rxjs";
+import { Observable, of } from "rxjs";
 import { Lesson } from "../model/lesson";
 import { AuthService } from "../services/auth.service";
+import { catchError } from "rxjs/operators";
 
 @Component({
   selector: "lessons",
@@ -19,7 +20,8 @@ export class LessonsComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.lessons$ = this.lessonsService.loadAllLessons();
-    this.isLoggedIn$ = this.authService.isLoggedIn$;
+    this.lessons$ = this.lessonsService
+      .loadAllLessons()
+      .pipe(catchError((err) => of([])));
   }
 }

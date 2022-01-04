@@ -1,6 +1,5 @@
 import { Component, OnInit } from "@angular/core";
 import { Observable } from "rxjs";
-import { User } from "./model/user";
 import { AuthService } from "./services/auth.service";
 
 @Component({
@@ -14,12 +13,19 @@ export class AppComponent implements OnInit {
 
   constructor(private authService: AuthService) {}
 
-  ngOnInit() {
-    this.isLoggedIn$ = this.authService.isLoggedIn$;
-    this.isLoggedOut$ = this.authService.isLoggedOut$;
+  ngOnInit(): void {
+    this.authService.retrieveAuthInfoFromUrl();
+  }
+
+  signUp() {
+    this.authService.signUp();
+  }
+
+  login() {
+    this.authService.login();
   }
 
   logout() {
-    this.authService.logout().subscribe();
+    this.authService.logout();
   }
 }
